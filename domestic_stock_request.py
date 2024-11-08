@@ -73,7 +73,7 @@ async def connect():
 
             for senddata in senddata_list:
                 await websocket.send(senddata)
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(3)
                 print(f"Input Command is :{senddata}")
 
             while True:
@@ -88,9 +88,7 @@ async def connect():
                         print("#### 국내주식 체결 ####")
                         data_cnt = int(recvstr[2])  # 체결데이터 개수
                         stockspurchase_domestic(data_cnt, recvstr[3])
-                        # await asyncio.sleep(0.2)
-
-
+                        await asyncio.sleep(3)
 
     except Exception as e:
         print('Exception Raised!')
@@ -100,8 +98,6 @@ async def connect():
 
         # 웹소켓 다시 시작
         await connect()     
-
-
 
 # # 비동기로 서버에 접속한다.
 asyncio.get_event_loop().run_until_complete(connect())
@@ -136,3 +132,90 @@ if __name__ == "__main__":
 
     except Exception:
         print("Exception 발생!")
+
+
+# 출력데이터 수정된 버전
+
+# import websockets
+# import json
+# import requests
+# import asyncio
+# import time
+
+# def get_approval(key, secret):
+#     url = 'https://openapi.koreainvestment.com:9443'
+#     headers = {"content-type": "application/json"}
+#     body = {"grant_type": "client_credentials",
+#             "appkey": key,
+#             "secretkey": secret}
+#     PATH = "oauth2/Approval"
+#     URL = f"{url}/{PATH}"
+#     time.sleep(0.05)
+#     res = requests.post(URL, headers=headers, data=json.dumps(body))
+#     approval_key = res.json()["approval_key"]
+#     return approval_key
+
+# def stockspurchase_domestic(data):
+#     pValue = data.split('^')
+#     체결시간 = pValue[1]
+#     현재가 = pValue[2]
+#     print(f"주식체결시간: {체결시간}")
+#     print(f"주식현재가: {현재가}")
+#     print("--------------------")
+
+# async def connect():
+#     try:
+#         g_appkey = "PSOMMGj57opv4saDiBelSp9usar9LtXfuko2"
+#         g_appsecret = "U9M/qgAs2UMY24ZIzUnTAXsXVbEROIg7Sf9cHzJyAyqJRG2e1Aen93zC55X//tCHOMXcG13Mp9Kv1+laKCpKpm+sGo9htc7/dBxiwfCOufhr8R2iI0YW512W8ESiDU3AtFRYZnq9VcvEkMggYFCKhiyuZJGt61rxzGPjg1ixondJ52KwGRU="
+
+#         url = 'ws://ops.koreainvestment.com:21000'
+
+#         g_approval_key = get_approval(g_appkey, g_appsecret)
+#         print("approval_key [%s]" % (g_approval_key))
+
+#         code_list = [['1','H0STCNT0','005930']]
+
+#         senddata_list = []
+        
+#         for i,j,k in code_list:
+#             temp = '{"header":{"approval_key": "%s","custtype":"P","tr_type":"%s","content-type":"utf-8"},"body":{"input":{"tr_id":"%s","tr_key":"%s"}}}'%(g_approval_key,i,j,k)
+#             senddata_list.append(temp)
+
+#         async with websockets.connect(url, ping_interval=None) as websocket:
+#             for senddata in senddata_list:
+#                 await websocket.send(senddata)
+#                 await asyncio.sleep(3)
+#                 print(f"Input Command is :{senddata}")
+
+#             while True:
+#                 data = await websocket.recv()
+
+#                 if data[0] == '0':
+#                     recvstr = data.split('|')
+#                     trid0 = recvstr[1]
+
+#                     if trid0 == "H0STCNT0":
+#                         stockspurchase_domestic(recvstr[3])
+#                         await asyncio.sleep(3)
+
+#     except Exception as e:
+#         print('Exception Raised!')
+#         print(e)
+#         print('Connect Again!')
+#         time.sleep(0.1)
+#         await connect()
+
+# async def main():
+#     try:
+#         await connect()
+#     except Exception as e:
+#         print('Exception Raised!')
+#         print(e)
+
+# if __name__ == "__main__":
+#     try:
+#         asyncio.run(main())
+#     except KeyboardInterrupt:
+#         print("KeyboardInterrupt Exception 발생!")
+#     except Exception:
+#         print("Exception 발생!")
